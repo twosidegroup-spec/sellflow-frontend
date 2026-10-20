@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/network/test_client.dart';
 import '../../../core/config/env.dart';
 import '../data/auth_repository.dart';
 
@@ -98,6 +99,11 @@ class AuthController extends StateNotifier<AuthState> {
       state = state.copyWith(status: AuthStatus.locked, error: 'An unexpected error occurred.');
       return false;
     }
+  }
+
+  Future<Map<String, dynamic>?> testBackendConnection() async {
+    final client = TestClient();
+    return await client.testConnection();
   }
 
   Future<bool> register({
