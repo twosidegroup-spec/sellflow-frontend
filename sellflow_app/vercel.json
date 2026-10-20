@@ -1,12 +1,15 @@
 {
   "version": 2,
+  "framework": null,
   "buildCommand": "flutter pub get && flutter build web --release",
   "outputDirectory": "build/web",
-  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "RENDER_API_URL": "https://sellflow-backend-0nyn.onrender.com/api/v1"
+  }
 }
