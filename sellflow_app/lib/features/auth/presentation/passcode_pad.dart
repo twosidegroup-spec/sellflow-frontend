@@ -75,7 +75,7 @@ class _PasscodePadState extends State<PasscodePad> with SingleTickerProviderStat
         height: 76,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppTheme.white,
+          color: AppTheme.background,
           border: Border.all(color: AppTheme.border, width: 1),
         ),
         child: Center(
