@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # TSG-DB: PostgreSQL Database
+  # Database: PostgreSQL
   tsg-db:
     image: postgres:15-alpine
     container_name: tsg-db
@@ -20,7 +20,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # TSG-BACKEND: FastAPI Backend
+  # Backend: FastAPI
   tsg-backend:
     build: ./backend
     container_name: tsg-backend
@@ -44,17 +44,15 @@ services:
       timeout: 10s
       retries: 3
 
-  # TSG-WEB: Nginx Frontend (Flutter Web)
-  tsg-web:
+  # API Gateway (optional - for production deployment)
+  tsg-gateway:
     image: nginx:alpine
-    container_name: tsg-web
+    container_name: tsg-gateway
     restart: always
     volumes:
-      - ./sellflow_app/build/web:/usr/share/nginx/html:ro
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - tsg-backend
     networks:
