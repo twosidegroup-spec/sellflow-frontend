@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # TSG-DB: PostgreSQL Database
+  tsg-db:
+    image: postgres:15-alpine
+    container_name: tsg-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${TSG_DB_USER:-sellflow_user}
+      - POSTGRES_PASSWORD=${TSG_DB_PASSWORD:-sellflow_secure_password_change_me}
+      - POSTGRES_DB=${TSG_DB_NAME:-sellflow_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - tsg-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TSG_DB_USER:-sellflow_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # TSG-BACKEND: FastAPI Backend
+  tsg-backend:
+    build: ./backend
+    container_name: tsg-backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://${TSG_DB_USER:-sellflow_user}:${TSG_DB_PASSWORD:-sellflow_secure_password_change_me}@tsg-db:5432/${TSG_DB_NAME:-sellflow_db}
+      - SECRET_KEY=${TSG_SECRET_KEY:-your_super_secret_key_change_this_in_production}
+      - APP_ENV=${TSG_APP_ENV:-production}
+      - APP_DEBUG=${TSG_APP_DEBUG:-false}
+      - CORS_ORIGINS=${TSG_CORS_ORIGINS:-http://localhost:80,https://localhost}
+    ports:
+      - "8000:8000"
+    depends_on:
+      tsg-db:
+        condition: service_healthy
+    networks:
+      - tsg-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # TSG-WEB: Nginx Frontend (Flutter Web)
+  tsg-web:
+    image: nginx:alpine
+    container_name: tsg-web
+    restart: always
+    volumes:
+      - ./sellflow_app/build/web:/usr/share/nginx/html:ro
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - tsg-backend
+    networks:
+      - tsg-network
+
+volumes:
+  pgdata:
+
+networks:
+  tsg-network:
+    driver: bridge
