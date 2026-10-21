@@ -1,0 +1,11 @@
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_sIz9gErN3pba1e8ZJ7801vsYriBr",
+      "name": "sellflow-backend",
+      "directory": ".",
+      "orgId": "team_enJge1cSrtNSX7HSmaud6oHS"
+    }
+  ]
+}
